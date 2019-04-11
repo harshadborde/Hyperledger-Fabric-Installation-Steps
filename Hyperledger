@@ -1,0 +1,182 @@
+To run your first hello world blockchain application aka Marbles in Linux Ubuntu 18.04 platform , you need to follow the below steps. The major challenge to run your first blockchain application is to setup the network.
+
+To start your first POC for blockchain is to setup the Fabric environment .
+Required Technology stack:
+GoLang - 1.7.0 or higher
+Docker CE - v1.13 or higher
+Docker Compose - v1.8 or higher
+Node.js - node v6.2+ or v8.1+ (v9 and v10 are not supported
+utilities like curl.
+
+-----1.First install the required software stacks-----
+.--------------------------------------------------
+sudo apt-get install curl
+
+sudo apt-get install git
+
+sudo apt-get install docker
+docker --version # just to ckeck if it is installed correctly
+sudo usermod -a -G docker $USER
+sudo systemctl start docker
+sudo systemctl enable docker
+
+sudo apt-get install docker-compose
+docker-compose --version # ckeck if it is installed correctly
+
+sudo apt-get install golang
+go version # ckeck if it is installed correctly
+
+sudo apt-get install nodejs
+node --version
+
+sudo apt-get install npm
+npm --version
+[NOTE: you need to logout and login back in order to use docker without superuser rights]
+
+-----2. Load the sample and required dependencies -----
+
+abdus@abdus-HP-EliteBook-8460p:~$ curl -sSL http://bit.ly/2ysbOFE | bash -s 1.2.0
+
+This will clone fabric-samples in you present working directory which we are going to use for the rest of the steps. (https://github.com/hyperledger/fabric-samples)
+-----3. All set. now test your network by the below commands.-----
+
+abdus@abdus-HP-EliteBook-8460p:$ cd fabric-samples/first-network/
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples/first-network$
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples/first-network$ ./byfn.sh generate
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples/first-network$ ./byfn.sh up
+once successful, you will see the lots of console outputs which starts with
+START
+
+.// lots more in between. so you can back after a coffee break.:)
+.
+END
+
+to shutdown the network
+./byfn.sh down
+
+At this point of time you are all set with the network setup.
+-----4. Now we will download the Marbles demo-----
+
+Below is my console output and current directory location.
+abdus@abdus-HP-EliteBook-8460p:$ pwd
+/home/abdus
+abdus@abdus-HP-EliteBook-8460p:$ cd fabric-samples/
+abdus@abdus-HP-EliteBook-8460p:~/fabric-samples$
+
+Now run the below commands to download the marbles
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples$ git clone https://github.com/IBM-Blockchain/marbles.git --depth 1
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples$ cd marbles
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples$ ls
+balance-transfer chaincode config fabric-ca Jenkinsfile marbles scripts
+basic-network chaincode-docker-devmode CONTRIBUTING.md first-network LICENSE package-lock.json setup_script.sh
+bin CODE_OF_CONDUCT.md fabcar high-throughput MAINTAINERS.md README.md
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples$ cd marbles/
+abdus@abdus-HP-EliteBook-8460p:~/fabric-samples/marbles$
+
+-----5. Some more dependencies to setup network .-----
+
+Steps are mentioned in the below link. However, we have already done some of the steps.
+
+https://github.com/IBM-Blockchain/marbles/blob/master/docs/use_local_hyperledger.md
+
+so don't need to do them again.. just do the below form the above link
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples$curl -sSL https://raw.githubusercontent.com/hyperledger/fabric/release-1.1/scripts/bootstrap-1.1.0-preview.sh -o setup_script.sh
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples$sudo bash setup_script.sh
+******************* this will take some time so another coffee break*******************************
+once done run the below
+abdus@abdus-HP-EliteBook-8460p:~/fabric-samples$export PATH=$PWD/bin:$PATH
+-----6. Start your network-----
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples$cd /fabcar
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples$ cd fabcar/
+abdus@abdus-HP-EliteBook-8460p:~/fabric-samples/fabcar$ sudo ./startFabric.sh
+-----*** NOTE!!!!!---BANG!! BANG!!BANG!!------>>>>By the above command sudo ./startFabric.sh your fabric network is up now .. and don't shutdown the network until you are done with the Marbles demo.
+-------BANG!! BANG!!BANG!!*-----
+
+this will start the network without any error.
+After a minute or two the command prompt will return. Now run the command docker ps to view your currently running docker containers. You should see something similar to the following:
+
+CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
+8bfa753977b1 dev-peer0.org1.example.com-fabcar-1.0 "chaincode -peer.a..." About a minute ago Up About a minute dev-peer0.org1.example.com-fabcar-1.0
+56a7a5f0fb4d hyperledger/fabric-tools:x86_64-1.0.0 "/bin/bash" 2 minutes ago Up 2 minutes cli
+b1600301db8f hyperledger/fabric-peer:x86_64-1.0.0 "peer node start" 2 minutes ago Up 2 minutes 0.0.0.0:7051->7051/tcp, 0.0.0.0:7053->7053/tcp peer0.org1.example.com
+16c045817270 hyperledger/fabric-orderer:x86_64-1.0.0 "orderer" 2 minutes ago Up 2 minutes 0.0.0.0:7050->7050/tcp orderer.example.com
+36fcbc7d2a44 hyperledger/fabric-couchdb:x86_64-1.0.0 "tini -- /docker-e..." 2 minutes ago Up 2 minutes 4369/tcp, 9100/tcp, 0.0.0.0:5984->5984/tcp couchdb
+a7bd6802bcf4 hyperledger/fabric-ca:x86_64-1.0.0 "sh -c 'fabric-ca-..." 2 minutes ago Up 2 minutes 0.0.0.0:7054->7054/tcp ca.example.com
+
+As I run, get the above processes
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples/fabcar$ docker ps
+CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
+5f32cf5d4811 dev-peer0.org1.example.com-marbles-v4-f704f1411b52539123b5920f0c3d59dc4c88aa255a82cd002be690a5a6a8150e "chaincode -peer.add…" 2 hours ago Up 2 hours dev-peer0.org1.example.com-marbles-v4
+cc03208139e3 dev-peer0.org1.example.com-fabcar-1.0-5c906e402ed29f20260ae42283216aa75549c571e2e380f3615826365d8269ba "chaincode -peer.add…" 7 hours ago Up 7 hours dev-peer0.org1.example.com-fabcar-1.0
+d0223ff27714 hyperledger/fabric-tools "/bin/bash" 7 hours ago Up 7 hours cli
+5de1b964a059 hyperledger/fabric-peer "peer node start" 7 hours ago Up 7 hours 0.0.0.0:7051->7051/tcp, 0.0.0.0:7053->7053/tcp peer0.org1.example.com
+b500392e4b4d hyperledger/fabric-ca "sh -c 'fabric-ca-se…" 7 hours ago Up 7 hours 0.0.0.0:7054->7054/tcp ca.example.com
+2815082155df hyperledger/fabric-couchdb "tini -- /docker-ent…" 7 hours ago Up 7 hours 4369/tcp, 9100/tcp, 0.0.0.0:5984->5984/tcp couchdb
+52b349e90965 hyperledger/fabric-orderer "orderer" 7 hours ago Up 7 hours 0.0.0.0:7050->7050/tcp orderer.example.com
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples/fabcar$
+
+-----NOTE------
+if you do not see all 6 containers running, then something is wrong. You will need to troubleshoot this before moving on. I'd suggest getting into the logs of one of the stopped containers with sudo docker logs peer0 (replace peer0 with w/e name is stopped).
+
+If you see a containerID already exists upon running docker-compose up, then you need to remove the existing container. This command will remove all containers docker rm -f $(docker ps -aq)
+----------
+-----7. Test your network by the fabcar application-----
+Just follow as mentioned in the link https://github.com/IBM-Blockchain/marbles/blob/master/docs/use_local_hyperledger.md
+point 3. Install Dependencies for a Test AND
+4. Test Network with Fabcar
+------ANOTHER BANG!! BANG!! BANG!!------
+DO NOT RUN THE stop.sh or teardown.sh until you are redoing for scratch (you can always try what happen if you do!! kust like FINDING NEMO movie)
+cd ../basic-network
+./stop.sh
+OR cd ../basic-network
+./teardown.sh
+----------
+-----8. Cool!! Install and Instantiate Chaincode for your Marbles-----
+----COFFEE BREAK again--------
+Run the following
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples$ cd marbles/
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples/marbles$ cd scripts/
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples/marbles/scripts$ npm install
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples/marbles/scripts$ ls -lrt
+total 28
+-rw-r--r-- 1 abdus abdus 2582 Dec 16 15:17 upgrade_chaincode.js
+-rw-r--r-- 1 abdus abdus 2777 Dec 16 15:17 instantiate_chaincode.js
+-rw-r--r-- 1 abdus abdus 2690 Dec 16 15:17 install_chaincode.js
+-rw-r--r-- 1 abdus abdus 101 Dec 16 15:17 Dockerfile
+-rw-r--r-- 1 abdus abdus 7903 Dec 16 15:17 docker-compose-marblesv3.yaml
+-rwxr-xr-x 1 abdus abdus 60 Dec 16 15:17 build_marbles_image.sh
+
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples/marbles/scripts$ node install_chaincode.js
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples/marbles/scripts$node instantiate_chaincode.js
+---**** Till this point all will be well****------
+-----9. Now run the Marbles-----
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples/marbles$npm install gulp -g
+abdus@abdus-HP-EliteBook-8460p:/fabric-samples/marbles$npm install
+abdus@abdus-HP-EliteBook-8460p:~/fabric-samples/marbles$gulp marbles_local
+if all goes well you will get the below screen <but it did not happen to me ..!! >
+image
+
+So we need to troubleshoot. Please find the attach doc , where I have attach the details console log to show what I did to run the Marbles locally in Ubuntu 18.04.
+
+"MarbleDemoConsoleOutput".docx
+There are troubleshooting steps to be remembered for the below situations.
+Issue 1. there are version compatibility issues for the node and it's packages for ' gulp'
+I had to play with different version of it <Please check the attached console output for the solution .. I just played with different version and it worked!!>.
+Issue 2. Issue to run gulp marbles_local
+This is know bug for Fabric so it is mentioned in the git link https://github.com/IBM-Blockchain/marbles/blob/master/docs/host_marbles_locally.md
+
+(it is OK if the console output says "NOT launched successfully yet"). If you tried to used gulp marbles_local, but got errors such as "Failed to load user "admin" from local key value store. Error: Error: Private key missing from key store. Can not establish the signing identity for user admin" even though the "client" section of the local connection profile JSON file contains the correct path reference in "client.credentialStore.path", then you might be subject to a bug described in https://jira.hyperledger.org/browse/FAB-2593. In such a case, backup the contents of the (hidden) directory $HOME/.hfc-key-store and copy all the files from the directory /$HOME/fabric-samples/fabcar/hfc-key-store to $HOME/.hfc-key-store (do not delete $HOME/.hfc-key-store and do not copy the /$HOME/fabric-samples/fabcar/hfc-key-store itself into /$HOME ). After copying the files, re-run gulp marbles_local
+
+Issue 3. error: Caught exception:
+TypeError: Cannot read property 'getConnectivityState' of undefined for the below step <step 1,2 and 3 works fine but it fails at step 4 as shown below>
+screenshot from 2018-12-16 23-00-13
+
+This is known issue and can be fixed by the below
+as a work around you could try not using eventhub, change use_events to false https://github.com/IBM-Blockchain/marbles/blob/master/config/marbles_local.json#L3 .
+Just read the below link-- IBM-Blockchain/marbles#229
+------------- Thats it!! ------ Please add your comment if you encounter other issues .
+-- Finally i was able to run the Marbles in my Ubuntu 18.04
+screenshot from 2018-12-16 23-04-51
+
+Reference:http://ghoshbishakh.github.io/blog/blogpost/2018/07/27/getting-started-with-hyperledger-fabric-in-ubuntu-18.04.html
+https://github.com/IBM-Blockchain/marbles
